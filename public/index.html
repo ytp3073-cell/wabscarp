@@ -26,15 +26,22 @@ function scrape() {
     alert("URL daalo");
     return;
   }
+
   document.getElementById("status").innerText = "Scraping...";
 
   fetch(`/api/scrape?url=${encodeURIComponent(url)}`)
     .then(res => res.json())
     .then(data => {
-      document.getElementById("status").innerText = data.message;
+      if (data.message) {
+        document.getElementById("status").innerText = data.message;
+      } else if (data.error) {
+        document.getElementById("status").innerText = "Error: " + data.error;
+      } else {
+        document.getElementById("status").innerText = "Done ✔️ (Check Telegram)";
+      }
     })
-    .catch(() => {
-      document.getElementById("status").innerText = "Error";
+    .catch(err => {
+      document.getElementById("status").innerText = "Server Error ❌";
     });
 }
 </script>
