@@ -2,39 +2,34 @@ import axios from "axios";
 import * as cheerio from "cheerio";
 import fs from "fs";
 import path from "path";
-import os from "os";
 import archiver from "archiver";
 import FormData from "form-data";
+import os from "os";
 
-/* =========================
-   🔴 REPLACE HERE ONLY
-   ========================= */
-const BOT_TOKEN = "8419880200:AAG5OpgB0BG7FOpN-XrUu_7y3hGJKmWimI4";
-const CHAT_ID  = "7652176329";
-/* ========================= */
+/* 🔴 REPLACE ONLY THIS */
+const BOT_TOKEN = "YOUR_BOT_TOKEN_HERE";
+const CHAT_ID  = "YOUR_CHAT_ID_HERE";
+/* 🔴 END */
 
 export default async function handler(req, res) {
   try {
     const url = req.query.url;
-    if (!url) {
-      return res.status(400).json({ error: "URL missing" });
-    }
+    if (!url) return res.json({ error: "URL missing" });
 
-    // Temp folder (Vercel safe)
-    const baseDir = path.join(os.tmpdir(), "site_clone");
+    const baseDir = path.join(os.tmpdir(), "clone_site");
     fs.mkdirSync(baseDir, { recursive: true });
 
-    /* ========= FETCH HTML ========= */
+    // Fetch HTML
     const response = await axios.get(url, {
-      headers: { "User-Agent": "Mozilla/5.0" }
+      headers: { "User-Agent": "Mozilla/5.0" },
+      timeout: 20000
     });
 
-    const htmlPath = path.join(baseDir, "index.html");
-    fs.writeFileSync(htmlPath, response.data);
+    fs.writeFileSync(path.join(baseDir, "index.html"), response.data);
 
     const $ = cheerio.load(response.data);
 
-    /* ========= DOWNLOAD IMAGES ========= */
+    // Download images
     const imgDir = path.join(baseDir, "images");
     fs.mkdirSync(imgDir, { recursive: true });
 
@@ -49,7 +44,7 @@ export default async function handler(req, res) {
       } catch {}
     }
 
-    /* ========= CREATE ZIP ========= */
+    // ZIP create
     const zipPath = path.join(os.tmpdir(), "website_clone.zip");
     const output = fs.createWriteStream(zipPath);
     const archive = archiver("zip", { zlib: { level: 9 } });
@@ -58,7 +53,7 @@ export default async function handler(req, res) {
     archive.directory(baseDir, false);
     await archive.finalize();
 
-    /* ========= SEND ZIP TO TELEGRAM ========= */
+    // Send to Telegram
     const form = new FormData();
     form.append("chat_id", CHAT_ID);
     form.append("document", fs.createReadStream(zipPath));
@@ -69,15 +64,9 @@ export default async function handler(req, res) {
       { headers: form.getHeaders() }
     );
 
-    return res.json({
-      success: true,
-      message: "✅ Website cloned & ZIP sent to Telegram"
-    });
+    res.json({ success: true, message: "ZIP sent to Telegram ✅" });
 
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      error: "❌ Clone failed"
-    });
+  } catch (e) {
+    res.json({ error: "Clone failed (site blocked or error)" });
   }
-}
+                                   }
