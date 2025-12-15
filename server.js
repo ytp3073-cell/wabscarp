@@ -1,25 +1,18 @@
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
 import scrapeHandler from "./api/scrape.js";
 
 const app = express();
 const PORT = 3000;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Frontend
-app.use(express.static(path.join(__dirname, "public")));
-
-// API
-app.get("/api/scrape", scrapeHandler);
-
-// Home
+// test route
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.send("SERVER IS RUNNING ✅");
 });
 
-app.listen(PORT, () => {
-  console.log("✅ Website running on port " + PORT);
+// api route
+app.get("/api/scrape", scrapeHandler);
+
+// IMPORTANT: bind to all interfaces
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("Server listening on port " + PORT);
 });
