@@ -7,8 +7,8 @@ import FormData from "form-data";
 import os from "os";
 
 /* 🔴 REPLACE ONLY THIS */
-const BOT_TOKEN = "YOUR_BOT_TOKEN_HERE";
-const CHAT_ID  = "YOUR_CHAT_ID_HERE";
+const BOT_TOKEN = "8419880200:AAG5OpgB0BG7FOpN-XrUu_7y3hGJKmWimI4";
+const CHAT_ID  = "7652176329";
 /* 🔴 END */
 
 export default async function handler(req, res) {
