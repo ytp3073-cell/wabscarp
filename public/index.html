@@ -2,46 +2,36 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Website Cloner Tool</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Website Cloner</title>
 </head>
-<body style="background:#0f0f1a;color:white;font-family:Arial;text-align:center">
+<body style="background:#0f0f1a;color:white;text-align:center;font-family:Arial">
 
-  <h2>Website Scraper & Telegram Sender</h2>
+<h2>Website Scraper → ZIP → Telegram</h2>
 
-  <input id="url" placeholder="Enter website URL"
-    style="width:80%;padding:10px;border-radius:8px;border:none"><br><br>
+<input id="url" placeholder="Enter website URL"
+ style="width:80%;padding:10px"><br><br>
 
-  <button onclick="scrape()"
-    style="padding:10px 20px;border-radius:8px;border:none;background:#ff00ff;color:white">
-    CHECK & SCRAPE
-  </button>
+<button onclick="scrape()" style="padding:10px 20px">
+ SCRAPE
+</button>
 
-  <p id="status"></p>
+<p id="status"></p>
 
 <script>
 function scrape() {
   const url = document.getElementById("url").value;
-  if (!url) {
-    alert("URL daalo");
-    return;
-  }
+  if (!url) return alert("URL daalo");
 
-  document.getElementById("status").innerText = "Scraping...";
+  document.getElementById("status").innerText = "Working...";
 
-  fetch(`/api/scrape?url=${encodeURIComponent(url)}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.message) {
-        document.getElementById("status").innerText = data.message;
-      } else if (data.error) {
-        document.getElementById("status").innerText = "Error: " + data.error;
-      } else {
-        document.getElementById("status").innerText = "Done ✔️ (Check Telegram)";
-      }
+  fetch("/api/scrape?url=" + encodeURIComponent(url))
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById("status").innerText =
+        d.message || d.error || "Done";
     })
-    .catch(err => {
-      document.getElementById("status").innerText = "Server Error ❌";
+    .catch(() => {
+      document.getElementById("status").innerText = "Server error";
     });
 }
 </script>
